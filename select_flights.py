@@ -17,3 +17,7 @@ funzione di n ed m.
 
 def select_flights():
     pass
+
+if __name__ == '__main__':
+    """Test Script"""
+    pass

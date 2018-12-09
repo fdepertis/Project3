@@ -8,3 +8,7 @@ ogni scalo).
 
 def find_route():
     pass
+
+if __name__ == '__main__':
+    """Test Script"""
+    pass

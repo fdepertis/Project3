@@ -8,3 +8,7 @@ funzione proposta.
 
 def bipartie():
     pass
+
+if __name__ == '__main__':
+    """Test Script"""
+    pass
