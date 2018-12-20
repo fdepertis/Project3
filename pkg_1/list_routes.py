@@ -10,9 +10,22 @@ atterraggio di un volo ed il tempo di decollo del volo successivo intercorre un 
 inferiore a c(a).
 """
 
-def list_routes():
-    pass
+from ..timetable import Timetable
+import datetime
 
-if __name__ == '__main__':
-    """Test Script"""
+def list_routes(t, a, b, actual_time, max_time):
+    if type(t) is not Timetable:
+        raise TypeError("t must be Timetable typed.")
+    if type(a) is not type(b) is not Timetable.Airport:
+        raise TypeError("a and b must be Timetable.Airport typed.")
+    if type(actual_time) is not datetime.time:
+        raise TypeError("actual_time must be datetime.time typed.")
+    if type(max_time) is not datetime.timedelta:
+        raise TypeError("max_time must be datetime.timedelta typed.")
+    discovery = {}
+    for f in t.incident_edges(a):
+        if f.l() > actual_time + a.c() and f.a() < max_time:
+            o = f.opposite(a)
+
+def _list_routes_aux(t, a, b, actual_time, max_time, routes):
     pass
