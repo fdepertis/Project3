@@ -79,8 +79,8 @@ class Timetable(Graph):
         def flight_time(self):
             return self._element.arrival_time - self._element.departure_time
 
-    def __init__(self):
-        super().__init__(True)
+    def __init__(self, directed = True):
+        super().__init__(directed)
 
     def _validate_vertex(self, a):
         """Verify that v is an Airport of this timetable."""
