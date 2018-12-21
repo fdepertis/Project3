@@ -32,9 +32,10 @@ class Timetable(Graph):
             return self._coincidence_time
 
         def __str__(self):
-            return "Airport: ", str(self.element(), "\nCoincidence Time:", str(self._coincidence_time)
+            return "Airport: " + str(self.element()) + "\nCoincidence Time: " + str(self._coincidence_time)
 
     class Flight(Graph.Edge):
+
 
         def __init__(self, origin, destination, departure_time, arrival_time, available_seats):
             if type(origin) is not type(destination) is not Timetable.Airport:
@@ -43,9 +44,12 @@ class Timetable(Graph):
                 raise TypeError("Departure and Arival Times must be datetime.time typed.")
             if type(available_seats) is not int or arrival_time < 1:
                 raise TypeError("Available Seats must be positive integer.")
-            self._origin = origin
-            self._destination = destination
-            self._element = (departure_time, arrival_time, available_seats)
+            if arrival_time>departure_time:
+                if arrival_time==departure_time:
+                    raise ValueError("departure time and arrival time are equal")
+                else:
+                    raise ValueError("departure time is greater then arrival time. It is impossible!")
+            super().__init__(origin, destination, (departure_time, arrival_time, available_seats))
 
         def opposite(self, a):
             """Return the vertex that is opposite v on this edge."""
@@ -59,7 +63,7 @@ class Timetable(Graph):
                 raise ValueError('A not incident to Flight')
 
         def __hash__(self):         # will allow edge to be a map/set key
-            return hash((self._origin, self._destination, self._element.departure_time, self._element.arrival_time, self._element.available_seats))
+            return hash((self._origin, self._destination, self._element[0], self._element[1], self._element[2]))
 
         def s(self):
             return self._origin
@@ -68,16 +72,16 @@ class Timetable(Graph):
             return self._destination
 
         def l(self):
-            return self._element.departure_time
+            return self._element[0]
 
         def a(self):
-            return self._element.arrival_time
+            return self._element[1]
 
         def p(self):
-            return self._element.available_seats
+            return self._element[2]
 
         def flight_time(self):
-            return self._element.arrival_time - self._element.departure_time
+            return self._element[1] - self._element[0]
 
     def __init__(self):
         super().__init__()
