@@ -17,7 +17,28 @@ def find_route(timetable, a, b, t):
     if type(t) is not datetime.datetime:
         raise TypeError("t must be datetime.datetime typed.")
     else:
-        discovered = {}
+        discovered_airports = dict()
+        discovered_flights = set()
         for airport in timetable.airports():
-            discovered[airport] = []
-    pass
+            discovered_airports[airport] = []
+        _find_route_aux(timetable, a, b, t, discovered_airports, discovered_flights)
+        return discovered_airports[b]
+
+
+
+def _find_route_aux(timetable, a, b, t, discovered_airports, discovered_flights):
+    if a == b:
+        return
+    else:
+        for f in timetable.incident_flights(a):
+            if f not in discovered_flights:
+                discovered_flights.add(f)
+                if f.l() > t + f.s().c():               #check if you can take the flight
+                    w = f.opposite(a)
+                    if len(discovered_airports[w]) == 0:
+                        discovered_airports[w].append(f)
+                    elif discovered_airports[w][len(discovered_airports)-1].a() > f.a():
+                        discovered_airports[w].clear()
+                        discovered_airports[w] = discovered_airports[a]
+                        discovered_airports[w].append(f)
+
