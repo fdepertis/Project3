@@ -6,9 +6,18 @@ per l’esercizio precedente, bisogna tener conto del tempo minimo di coincidenz
 ogni scalo).
 """
 
-def find_route():
-    pass
+from ..timetable import Timetable
+import datetime
 
-if __name__ == '__main__':
-    """Test Script"""
+def find_route(timetable, a, b, t):
+    if type(timetable) is not Timetable:
+        raise TypeError("timetable must be Timetable typed.")
+    if type(a) is not type(b) is not Timetable.Airport:
+        raise TypeError("a and b must be Timetable.Airport typed.")
+    if type(t) is not datetime.datetime:
+        raise TypeError("t must be datetime.datetime typed.")
+    else:
+        discovered = {}
+        for airport in timetable.airports():
+            discovered[airport] = []
     pass

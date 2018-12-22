@@ -36,4 +36,3 @@ def _list_routes_aux(t, a, b, actual_time, max_time, routes):
             routes[o] = f
             if f.l() > actual_time + a.c() or f.a() < max_time:
                 _list_routes_aux(t, o, b, o.a(), max_time, routes)
-

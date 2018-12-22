@@ -37,23 +37,27 @@ class Timetable:
         def __str__(self):
             return "Airport: " + str(self._name) + "\nCoincidence Time: " + str(self._coincidence_time)
 
+        def __eq__(self, other):
+            return self._name == other._name and self._coincidence_time == other._coincidence_time
+
     class Flight:
         __slots__ = '_origin', '_destination', '_departure_time', '_arrival_time', '_available_seats'
 
         def __init__(self, origin, destination, departure_time, arrival_time, available_seats):
             if type(origin) is not type(destination) is not Timetable.Airport:
                 raise TypeError("Origin and Destination must be Timetable.Airport typed.")
-            if type(departure_time) is not type(arrival_time) is not datetime.datetime:
+            elif type(departure_time) is not type(arrival_time) is not datetime.datetime:
                 raise TypeError("Departure and Arival Times must be datetime.datetime typed.")
-            if type(available_seats) is not int or available_seats < 1:
+            elif type(available_seats) is not int or available_seats < 1:
                 raise TypeError("Available Seats must be positive integer.")
-            if arrival_time <= departure_time:
+            elif arrival_time <= departure_time:
                 raise ValueError("Arrival time must be greater than departure time.")
-            self._origin = origin
-            self._destination = destination
-            self._departure_time = departure_time
-            self._arrival_time = arrival_time
-            self._available_seats = available_seats
+            else:
+                self._origin = origin
+                self._destination = destination
+                self._departure_time = departure_time
+                self._arrival_time = arrival_time
+                self._available_seats = available_seats
 
         def opposite(self, a):
             """Return the vertex that is opposite v on this edge."""
@@ -124,9 +128,14 @@ class Timetable:
     def get_direct_flights(self, origin, destination):
         self._validate_airport(origin)
         self._validate_airport(destination)
-        for f in self._outgoing[origin]:
-            if f.d() == destination:
-                yield f
+        if self.degree(origin) < self.degree(destination, False):
+            for f in self._outgoing[origin]:
+                if f.d() == destination:
+                    yield f
+        else:
+            for f in self._incoming[destination]:
+                if f.s() == origin:
+                    yield f
 
     def degree(self, a, outgoing=True):
         self._validate_airport(a)
@@ -162,7 +171,7 @@ class Timetable:
         i = 0
         added = False
         while i < len(flight_list) and not added:
-            if flight_list[i].l() > f.l():
+            if flight_list[i].a() > f.a():
                 flight_list.insert(i, f)
                 added = True
             i += 1
