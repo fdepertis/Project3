@@ -122,6 +122,8 @@ class Timetable:
         return result
 
     def get_direct_flights(self, origin, destination):
+        self._validate_airport(origin)
+        self._validate_airport(destination)
         for f in self._outgoing[origin]:
             if f.d() == destination:
                 yield f
