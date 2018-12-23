@@ -88,8 +88,8 @@ class Timetable:
         def flight_time(self):
             return self._arrival_time - self._departure_time
 
-        def __hash__(self):
-            return hash((self._origin, self._destination, self._departure_time, self._arrival_time, self._available_seats))
+        """def __hash__(self):
+            return hash((self._origin, self._destination, self._departure_time, self._arrival_time, self._available_seats))"""
 
         def __str__(self):
             return "Flight from: " + str(self.s().name()) + ", to: " + str(self.d().name()) + "\nDeparture: " + str(self.l()) + ", Arrival: " + str(self.a()) + ", Available Seats: " + str(self.p())
@@ -148,6 +148,12 @@ class Timetable:
         for f in adj[a]:
             yield f
 
+    def incident_flights_reversed(self, a, outgoing=True):
+        self._validate_airport(a)
+        adj = self._outgoing if outgoing else self._incoming
+        for i in range(1, len(adj[a])+1):
+            yield adj[a][-i]
+
     def insert_airport(self, name, coincidence_time):
         """Insert and return a new Vertex with element x."""
         a = self.Airport(name, coincidence_time)
@@ -171,7 +177,7 @@ class Timetable:
         i = 0
         added = False
         while i < len(flight_list) and not added:
-            if flight_list[i].a() > f.a():
+            if flight_list[i].l() > f.l():
                 flight_list.insert(i, f)
                 added = True
             i += 1
@@ -192,7 +198,10 @@ if __name__ == '__main__':
     t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 7, 0, 0), datetime.datetime(2018, 1, 1, 9, 0, 0), 200)
 
     print("Incident Flights: ")
-    for f in t.incident_flights(nap, mil):
+    for f in t.incident_flights(nap):
+        print(f)
+    print("\nIncident Flights reversed: ")
+    for f in t.incident_flights_reversed(nap):
         print(f)
     print("\nAirport Count: ", t.airport_count())
     print("\nAirports: ")

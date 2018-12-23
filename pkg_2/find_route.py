@@ -9,6 +9,7 @@ ogni scalo).
 from ..timetable import Timetable
 import datetime
 
+
 def find_route(timetable, a, b, t):
     if type(timetable) is not Timetable:
         raise TypeError("timetable must be Timetable typed.")
@@ -17,31 +18,37 @@ def find_route(timetable, a, b, t):
     if type(t) is not datetime.datetime:
         raise TypeError("t must be datetime.datetime typed.")
     else:
-        discovered_airports = dict()            #dictionary used to map airports (keys) with routes (values)
-        discovered_flights = set()              #set used to check if a flight is already taken
+        discovered = set()                                  #set used to check already taken airports
+        routes = dict()                                     #dictionary used to map airports (keys) with routes (values)
+        routes[a] = None
         for airport in timetable.airports():
-            discovered_airports[airport] = []   #set an empty list for every airport in discovered_airports
-        _find_route_aux(timetable, a, b, t, discovered_airports, discovered_flights)    #recursive function
-        return discovered_airports[b]           #return best route for b
+            if not airport == a:
+                routes[airport] = []                        #set an empty list for every airport in discovered_airports
+        _find_route_aux(timetable, a, b, t, routes, discovered)                                     #recursive function
+        return routes[b]                                                                       #return best route for b
 
 
-def _find_route_aux(timetable, a, b, t, discovered_airports, discovered_flights):
+def _find_route_aux(timetable, a, b, t, routes, discovered):
     if a == b:
-        return                                          #if it has arrived in b, it returns
+        return                                                                      #if it has arrived in b, it returns
     else:
-        for f in timetable.incident_flights(a):         #for each incident outgoing flight of a
-            if f not in discovered_flights:             #if this flight has not taken yet
-                discovered_flights.add(f)               #take it
-                if f.l() > t + f.s().c():               #check if you can take the flight
-                    w = f.opposite(a)
-                    #if is the first time you find this airport, tell it a new flight to reach it.
-                    if len(discovered_airports[w]) == 0:
-                        discovered_airports[w].append(f)
-                    #else, if you found a faster sequence of flights to reach it, update its routes
-                    elif discovered_airports[w][len(discovered_airports)-1].a() > f.a():
-                        discovered_airports[w].clear()
-                        discovered_airports[w] = discovered_airports[a]
-                        discovered_airports[w].append(f)
-                    #run again this function with same timetable, opposite airport, b, arrival time of this flight, ...
-                    _find_route_aux(timetable, w, b, f.a(), discovered_airports, discovered_flights)
-
+        for f in timetable.incident_flights_reversed(a):                        #for each incident outgoing flight of a
+            if f.l() > t + f.s().c():                                                 #check if you can take the flight
+                w = f.opposite(a)
+                #if you want to go from a to a, the best way is to take no flights
+                if routes[w] is None:
+                    pass
+                #if is the first time you find this airport, tell it a new flight to reach it
+                elif len(routes[w]) == 0:
+                    routes[w].append(f)
+                #else, if you found a faster sequence of flights to reach it, update its routes
+                elif routes[w][-1].a() > f.a():
+                    routes[w].clear()
+                    routes[w] = routes[a]
+                    routes[w].append(f)
+                #run again this function with same timetable, opposite airport, b, arrival time of this flight, ...
+                if w not in discovered:
+                    discovered.add(w)
+                    _find_route_aux(timetable, w, b, f.a(), routes, discovered)
+            else:
+                break
