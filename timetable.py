@@ -154,7 +154,7 @@ class Timetable:
         for i in range(1, len(adj[a])+1):
             yield adj[a][-i]
 
-    def insert_airport(self, name, coincidence_time):
+    def insert_airport(self, name, coincidence_time=datetime.timedelta(0)):
         """Insert and return a new Vertex with element x."""
         a = self.Airport(name, coincidence_time)
         self._outgoing[a] = []
@@ -189,6 +189,7 @@ if __name__ == '__main__':
     t = Timetable()
     nap = t.insert_airport("NAP", datetime.timedelta(minutes=30))
     mil = t.insert_airport("MIL", datetime.timedelta(minutes=30))
+    rom = t.insert_airport("ROM")
 
     t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 12, 0, 0), datetime.datetime(2018, 1, 1, 14, 0, 0), 200)
     t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 8, 0, 0), datetime.datetime(2018, 1, 1, 10, 0, 0), 200)
