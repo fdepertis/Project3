@@ -40,7 +40,8 @@ def dfs_paths(timetable, start, goal, t, T, current, path_flights = None):
             print("ECCO IL VOLO CHE NON PUOI PRENDERE")
             print(next)
             print("NON LO PUOI PRENDERE PERCHE'")
-            print(str(path_flights[len(path_flights)-1].a()) + " + " + str(next.s().c()) + " <= " +  str(next.l()))
+            print(str(path_flights[len(path_flights)-1].a()) + " + " + str(next.s().c()) + " > " +  str(next.l()))
+            print("NON CE LA FAI A PRENDERE LA COINCIDENZA")
             print("")
         if (next.s() != start and path_flights[len(path_flights)-1].a() + next.s().c() > next.l()):
             continue
@@ -67,7 +68,7 @@ if __name__ == '__main__':
     timetable.insert_flight(e,f,datetime.datetime(2018,12,22,9,0,0),datetime.datetime(2018,12,22,10,0,0),9)
     timetable.insert_flight(c,f,datetime.datetime(2018,12,22,9,0,0),datetime.datetime(2018,12,22,10,0,0),9)
     timetable.insert_flight(c,f,datetime.datetime(2018,12,22,14,0,0),datetime.datetime(2018,12,22,15,0,0),9)
-    
+
     for i in list_routes(timetable,a,f,datetime.datetime(2018,12,22,7,0,0),datetime.timedelta(hours=3)):
         print("[ ")
         for k in i:
