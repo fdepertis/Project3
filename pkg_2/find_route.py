@@ -7,7 +7,6 @@ ogni scalo).
 """
 
 from Project3.timetable import Timetable
-from Project3.TdP_collections.priority_queue.adaptable_heap_priority_queue import AdaptableHeapPriorityQueue
 import datetime
 
 
