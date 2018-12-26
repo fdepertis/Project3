@@ -60,8 +60,8 @@ class Timetable:
                 self._available_seats = available_seats
                 self._diesel = self.compute_diesel(departure_time,arrival_time)
 
-        def compute_diesel(self,d,a):
-            e = a-d
+        def compute_diesel(self, d, a):
+            e = a - d
             return (e.days + e.seconds/60/60)*60
 
         def opposite(self, a):
@@ -96,11 +96,11 @@ class Timetable:
         def flight_time(self):
             return self._arrival_time - self._departure_time
 
-        """def __hash__(self):
-            return hash((self._origin, self._destination, self._departure_time, self._arrival_time, self._available_seats))"""
-
         def __str__(self):
             return "Flight from: " + str(self.s().name()) + ", to: " + str(self.d().name()) + "\nDeparture: " + str(self.l()) + ", Arrival: " + str(self.a()) + ", Available Seats: " + str(self.p())
+
+        def __eq__(self, other):
+            return self.s() == other.s() and self.d() == other.d() and self.l() == other.l() and self.a() == other.a()
 
     def __init__(self):
         self._outgoing = {}
@@ -181,6 +181,9 @@ class Timetable:
         self._validate_airport(origin)
         self._validate_airport(destination)
         f = self.Flight(origin, destination, departure_time, arrival_time, available_seats)
+        for flight in self.get_direct_flights(origin, destination):
+            if f == flight:
+                raise ValueError("There is already a flight with same origin, destination, departure and arrival times.")
         self._insert_flight_in_order(self._outgoing[origin], f)
         self._insert_flight_in_order(self._incoming[destination], f)
 

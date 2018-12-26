@@ -6,7 +6,8 @@ per l’esercizio precedente, bisogna tener conto del tempo minimo di coincidenz
 ogni scalo).
 """
 
-from ..timetable import Timetable
+from Project3.timetable import Timetable
+from Project3.TdP_collections.priority_queue.adaptable_heap_priority_queue import AdaptableHeapPriorityQueue
 import datetime
 
 
@@ -18,37 +19,36 @@ def find_route(timetable, a, b, t):
     if type(t) is not datetime.datetime:
         raise TypeError("t must be datetime.datetime typed.")
     else:
-        discovered = set()                                  #set used to check already taken airports
-        routes = dict()                                     #dictionary used to map airports (keys) with routes (values)
-        routes[a] = None
+        d = dict()              #used to map airports with arrival times
+        q = dict()              #same of d, but this is used as queue
+        routes = dict()         #used to map airports with routes
+        cloud = set()           #used to set an airport as discovered
+
         for airport in timetable.airports():
-            if not airport == a:
-                routes[airport] = []                        #set an empty list for every airport in discovered_airports
-        _find_route_aux(timetable, a, b, t, routes, discovered)                                     #recursive function
-        return routes[b]                                                                       #return best route for b
-
-
-def _find_route_aux(timetable, a, b, t, routes, discovered):
-    if a == b:
-        return                                                                      #if it has arrived in b, it returns
-    else:
-        for f in timetable.incident_flights_reversed(a):                        #for each incident outgoing flight of a
-            if f.l() > t + f.s().c():                                                 #check if you can take the flight
-                w = f.opposite(a)
-                #if you want to go from a to a, the best way is to take no flights
-                if routes[w] is None:
-                    pass
-                #if is the first time you find this airport, tell it a new flight to reach it
-                elif len(routes[w]) == 0:
-                    routes[w].append(f)
-                #else, if you found a faster sequence of flights to reach it, update its routes
-                elif routes[w][-1].a() > f.a():
-                    routes[w].clear()
-                    routes[w] = routes[a]
-                    routes[w].append(f)
-                #run again this function with same timetable, opposite airport, b, arrival time of this flight, ...
-                if w not in discovered:
-                    discovered.add(w)
-                    _find_route_aux(timetable, w, b, f.a(), routes, discovered)
+            if airport is a:
+                d[airport] = t
+                q[airport] = t
             else:
-                break
+                d[airport] = datetime.datetime(5000, 1, 1, 0, 0, 0)
+                q[airport] = datetime.datetime(5000, 1, 1, 0, 0, 0)
+            routes[airport] = []
+
+        while len(q) > 0:
+            airport = min(q, key=q.get)
+            cloud.add(airport)
+            del q[airport]
+            for f in timetable.incident_flights_reversed(airport):
+                if f.l() > d[airport] + f.s().c():
+                    w = f.opposite(airport)
+                    if w not in cloud:
+                        if len(routes[w]) == 0 or routes[w][-1].a() > f.a():
+                            routes[w].clear()
+                            for flight in routes[airport]:
+                                routes[w].append(flight)
+                            routes[w].append(f)
+                            d[w] = f.a()
+                            if w in q:
+                                q[w] = f.a()
+                else:
+                    break
+        return routes[b]
