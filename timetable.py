@@ -41,7 +41,7 @@ class Timetable:
             return self._name == other._name and self._coincidence_time == other._coincidence_time
 
     class Flight:
-        __slots__ = '_origin', '_destination', '_departure_time', '_arrival_time', '_available_seats'
+        __slots__ = '_origin', '_destination', '_departure_time', '_arrival_time', '_available_seats', '_diesel'
 
         def __init__(self, origin, destination, departure_time, arrival_time, available_seats):
             if type(origin) is not type(destination) is not Timetable.Airport:
@@ -58,6 +58,11 @@ class Timetable:
                 self._departure_time = departure_time
                 self._arrival_time = arrival_time
                 self._available_seats = available_seats
+                self._diesel = self.compute_diesel(departure_time,arrival_time)
+
+        def compute_diesel(self,d,a):
+            e = a-d
+            return (e.days + e.seconds/60/60)*60
 
         def opposite(self, a):
             """Return the vertex that is opposite v on this edge."""
@@ -69,6 +74,9 @@ class Timetable:
                 return self._origin
             else:
                 raise ValueError('A not incident to Flight')
+
+        def diesel(self):
+            return self._diesel
 
         def s(self):
             return self._origin
@@ -97,6 +105,9 @@ class Timetable:
     def __init__(self):
         self._outgoing = {}
         self._incoming = {}
+
+    def __getitem__(self, item):
+        return self._outgoing[item]
 
     def _validate_airport(self, a):
         """Verify that a is an Airport of this timetable."""
