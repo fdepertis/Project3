@@ -18,10 +18,10 @@ def find_route(timetable, a, b, t):
     if type(t) is not datetime.datetime:
         raise TypeError("t must be datetime.datetime typed.")
     else:
-        d = dict()              #used to map airports with arrival times
-        q = dict()              #same of d, but this is used as queue
-        routes = dict()         #used to map airports with routes
-        cloud = set()           #used to set an airport as discovered
+        d = dict()                                                      # used to map airports with arrival times
+        q = dict()                                                      # same of d, but this is used as queue
+        routes = dict()                                                 # used to map airports with routes
+        cloud = set()                                                   # used to set an airport as discovered
 
         for airport in timetable.airports():
             if airport is a:
@@ -33,9 +33,9 @@ def find_route(timetable, a, b, t):
             routes[airport] = []
 
         while len(q) > 0:
-            airport = min(q, key=q.get)
-            cloud.add(airport)
-            del q[airport]
+            airport = min(q, key=q.get)                                 # get the key that has lowest value in q
+            cloud.add(airport)                                          # add airport to solution
+            del q[airport]                                              # delete airport from q
             for f in timetable.incident_flights_reversed(airport):
                 if f.l() > d[airport] + f.s().c():
                     w = f.opposite(airport)
