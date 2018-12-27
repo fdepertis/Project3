@@ -15,6 +15,8 @@ def bipartite(g):
 
     for u in g.vertices():  # prendo un vertice di partenza
         s = u
+        break
+        
     red = set()
     blue = set()
     level = [s]
