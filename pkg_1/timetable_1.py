@@ -12,8 +12,8 @@ compagnia è dato da:
     - l’orario di arrivo a(f)
     - il numero di posti disponibili sul volo p(f)
 
-Timetable implemented as Edge List, where there is an Airport List and Flight List.
-Flight list is ordered on decreasing Available Seats of Flights.
+Timetable implemented as Adjacency List, where a two dictionaries map Airports to incident Flights (outgoing anc incoming).
+These 2*n Flight lists are ordered on increasing departure time of Flights.
 """
 
 import datetime
@@ -89,10 +89,6 @@ class Timetable:
         def p(self):
             return self._available_seats
 
-        def flight_time_in_minutes(self):
-            delta = self.a() - self.l()
-            return delta.total_seconds()/60
-
         def __hash__(self):
             return hash((self.s(), self.d(), self.l(), self.a(), self. p()))
 
@@ -103,76 +99,70 @@ class Timetable:
             return self.s() == other.s() and self.d() == other.d() and self.l() == other.l() and self.a() == other.a()
 
     def __init__(self):
-        self._airports = []
-        self._flights = []
+        self._outgoing = {}
+        self._incoming = {}
 
     def _validate_airport(self, a):
         """Verify that a is an Airport of this timetable."""
         if not isinstance(a, self.Airport):
             raise TypeError('Airport expected')
-        elif a not in self._airports:
+        elif a not in self._outgoing:
             raise ValueError('This airport does not belong to this timetable.')
 
     def airport_count(self):
-        return len(self._airports)
+        return len(self._outgoing)
 
     def airports(self):
-        for a in self._airports:
-            yield a
+        return self._outgoing.keys()
 
     def flight_count(self):
-        return len(self._flights)
+        result = 0
+        for internal_list in self._outgoing.values():
+            for f in internal_list:
+                result += 1
+        return result
 
     def flights(self):
-        for f in self._flights:
-            yield f
+        result = set()
+        for internal_list in self._outgoing.values():
+            for f in internal_list:
+                result.add(f)
+        return result
 
     def get_direct_flights(self, origin, destination):
         self._validate_airport(origin)
         self._validate_airport(destination)
-        for f in self._flights:
-            if f.s() is origin and f.d() is destination:
-                yield f
+        if self.degree(origin) < self.degree(destination, False):
+            for f in self._outgoing[origin]:
+                if f.d() == destination:
+                    yield f
+        else:
+            for f in self._incoming[destination]:
+                if f.s() == origin:
+                    yield f
 
     def degree(self, a, outgoing=True):
         self._validate_airport(a)
-        result = 0
-        if outgoing:
-            for f in self._flights:
-                if f.s() is a:
-                    result += 1
-        else:
-            for f in self._flights:
-                if f.d() is a:
-                    result += 1
-        return result
+        adj = self._outgoing if outgoing else self._incoming
+        return len(adj[a])
 
     def incident_flights(self, a, outgoing=True):
         self._validate_airport(a)
-        if outgoing:
-            for f in self._flights:
-                if f.s() is a:
-                    yield f
-        else:
-            for f in self._flights:
-                if f.d() is a:
-                    yield f
+        adj = self._outgoing if outgoing else self._incoming
+        for f in adj[a]:
+            yield f
 
     def incident_flights_reversed(self, a, outgoing=True):
         self._validate_airport(a)
-        if outgoing:
-            for i in range(1, len(self._flights)+1):
-                if self._flights[-i].s() is a:
-                    yield self._flights[-i]
-        else:
-            for i in range(1, len(self._flights)+1):
-                if self._flights[-i].d() is a:
-                    yield self._flights[-i]
+        adj = self._outgoing if outgoing else self._incoming
+        for i in range(1, len(adj[a])+1):
+            yield adj[a][-i]
 
     def insert_airport(self, name, coincidence_time=datetime.timedelta(0)):
         """Insert and return a new Vertex with element x."""
         a = self.Airport(name, coincidence_time)
-        self._airports.append(a)
+        self._outgoing[a] = []
+        self._incoming[a] = []
         return a
 
     def insert_flight(self, origin, destination, departure_time, arrival_time, available_seats):
@@ -187,16 +177,19 @@ class Timetable:
         for flight in self.get_direct_flights(origin, destination):
             if f == flight:
                 raise ValueError("There is already a flight with same origin, destination, departure and arrival times.")
+        self._insert_flight_in_order(self._outgoing[origin], f)
+        self._insert_flight_in_order(self._incoming[destination], f)
 
+    def _insert_flight_in_order(self, flight_list, f):
         i = 0
         added = False
-        while i < len(self._flights) and not added:
-            if self._flights[i].p() < f.p():
-                self._flights.insert(i, f)
+        while i < len(flight_list) and not added:
+            if flight_list[i].l() > f.l():
+                flight_list.insert(i, f)
                 added = True
             i += 1
         if not added:
-            self._flights.append(f)
+            flight_list.append(f)
 
 
 if __name__ == '__main__':
@@ -205,12 +198,12 @@ if __name__ == '__main__':
     mxp = t.insert_airport("MXP", datetime.timedelta(minutes=30))
     rom = t.insert_airport("FCO")
 
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 12, 0, 0), datetime.datetime(2018, 1, 1, 14, 0, 0), 500)
+    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 12, 0, 0), datetime.datetime(2018, 1, 1, 14, 0, 0), 200)
     t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 8, 0, 0), datetime.datetime(2018, 1, 1, 10, 0, 0), 200)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 10, 0, 0), datetime.datetime(2018, 1, 1, 12, 0, 0), 300)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 13, 0, 0), datetime.datetime(2018, 1, 1, 15, 0, 0), 600)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 9, 0, 0), datetime.datetime(2018, 1, 1, 11, 0, 0), 400)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 7, 0, 0), datetime.datetime(2018, 1, 1, 9, 0, 0), 100)
+    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 10, 0, 0), datetime.datetime(2018, 1, 1, 12, 0, 0), 200)
+    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 13, 0, 0), datetime.datetime(2018, 1, 1, 15, 0, 0), 200)
+    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 9, 0, 0), datetime.datetime(2018, 1, 1, 11, 0, 0), 200)
+    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 7, 0, 0), datetime.datetime(2018, 1, 1, 9, 0, 0), 200)
 
     print("Incident Flights: ")
     for f in t.incident_flights(nap):
@@ -234,4 +227,3 @@ if __name__ == '__main__':
     print("\nDirect Flights: ")
     for f in t.get_direct_flights(nap, mxp):
         print(f)
-        print(f.flight_time())
