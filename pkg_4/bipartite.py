@@ -29,7 +29,7 @@ def bipartite(g):
             elif u in blue:
                 color = 2
             for e in g.incident_edges(u):
-                if nb == 1:            # se nel vertice precedente si è verificata la condizione di non bipartizione usciamo dal ciclo
+                if nb == None:            # se nel vertice precedente si è verificata la condizione di non bipartizione usciamo dal ciclo
                     break
                 else:
                     v = e.opposite(u)     # prendo i vertici collegati a quello attuale
@@ -42,7 +42,7 @@ def bipartite(g):
                             red.add(v)  # se il vertice attuale è blu coloro quelli collegati di rosso
                     else:
                         if v in red and color == 1 or v in blue and color == 2:  # se i vertici collegati a quello attuale sono già stati visitati controllo il loro colore e se è lo stesso
-                            nb = 1                                               # attuale imposto la variabile non bipartito a 1
+                            nb = None  # attuale imposto la variabile non bipartito a None
 
         level = next_level  # vado a controllare il livello successivo
     return nb, red, blue  # ritorno il valore di nb e le due partizioni
@@ -50,7 +50,7 @@ def bipartite(g):
 
 if __name__ == '__main__':
 
-    gbi = Graph()     #grafo bipartito
+    gbi = Graph()
 
     a = gbi.insert_vertex("A")
     b = gbi.insert_vertex("B")
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     gbi.insert_edge(d, e)
     gbi.insert_edge(e, a)
 
-    gbi2 = Graph()    #grafo bipartito
+    gbi2 = Graph()
 
     a = gbi2.insert_vertex("A")
     b = gbi2.insert_vertex("B")
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     gbi2.insert_edge(b, c, None)
     gbi2.insert_edge(d, e, None)
 
-    gnbi = Graph()     #grafo non bipartito
+    gnbi = Graph()
 
     a = gnbi.insert_vertex("A")
     b = gnbi.insert_vertex("B")
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     gnbi.insert_edge(c, e, None)
     gnbi.insert_edge(d, e, None)
 
-    gnbi2 = Graph()     #grafo non bipartito
+    gnbi2 = Graph()
 
     a = gnbi2.insert_vertex("A")
     b = gnbi2.insert_vertex("B")
@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     a, rosso, blu = bipartite(gbi)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
 
-    if (a == 1):
+    if (a == None):
         print("Grafo non bipartito")
     else:
         print("Grafo bipartito\n")
@@ -120,6 +120,23 @@ if __name__ == '__main__':
         print("\nPartizione Y\n")
         for u in blu:
             print(u)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
