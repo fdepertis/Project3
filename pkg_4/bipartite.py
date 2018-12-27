@@ -50,7 +50,7 @@ def bipartite(g):
 
 if __name__ == '__main__':
 
-    gbi = Graph()
+    gbi = Graph()      #GRAFO UNO
 
     a = gbi.insert_vertex("A")
     b = gbi.insert_vertex("B")
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     gbi.insert_edge(d, e)
     gbi.insert_edge(e, a)
 
-    gbi2 = Graph()
+    gbi2 = Graph()    #GRAFO DUE
 
     a = gbi2.insert_vertex("A")
     b = gbi2.insert_vertex("B")
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     gbi2.insert_edge(b, c, None)
     gbi2.insert_edge(d, e, None)
 
-    gnbi = Graph()
+    gnbi = Graph()   #GRAFO TRE
 
     a = gnbi.insert_vertex("A")
     b = gnbi.insert_vertex("B")
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     gnbi.insert_edge(c, e, None)
     gnbi.insert_edge(d, e, None)
 
-    gnbi2 = Graph()
+    gnbi2 = Graph()  #GRAFO QUATTRO
 
     a = gnbi2.insert_vertex("A")
     b = gnbi2.insert_vertex("B")
@@ -108,25 +108,75 @@ if __name__ == '__main__':
     rosso = set()
     blu = set()
 
-    a, rosso, blu = bipartite(gbi)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
 
+
+    a, rosso, blu = bipartite(gbi)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
+    print("\nTEST PRIMO GRAFO\n")
     if (a == None):
-        print("Grafo non bipartito")
+            print("\nGrafo non bipartito")
+            print("\n-------------------------------------------------------\n")
     else:
         print("Grafo bipartito\n")
         print("Partizione X\n")
         for i in rosso:
             print(i)
         print("\nPartizione Y\n")
-        for u in blu:
-            print(u)
+        for c in blu:
+            print(c)
+        print("\n-------------------------------------------------------\n")
+
+
+    a, rosso, blu = bipartite(gbi2)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
+    print("\nTEST SECONDO GRAFO\n")
+    if (a == None):
+            print("\nGrafo non bipartito")
+            print("\n-------------------------------------------------------\n")
+    else:
+        print("Grafo bipartito\n")
+        print("Partizione X\n")
+        for i in rosso:
+            print(i)
+        print("\nPartizione Y\n")
+        for c in blu:
+            print(c)
+        print("\n-------------------------------------------------------\n")
+
+
+
+    a, rosso, blu = bipartite(gnbi)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
+    print("\nTEST TERZO GRAFO\n")
+    if (a == None):
+            print("\nGrafo non bipartito")
+            print("\n-------------------------------------------------------\n")
+    else:
+        print("Grafo bipartito\n")
+        print("Partizione X\n")
+        for i in rosso:
+            print(i)
+        print("\nPartizione Y\n")
+        for c in blu:
+            print(c)
+        print("\n-------------------------------------------------------\n")
 
 
 
 
 
 
-
+    a, rosso, blu = bipartite(gnbi2)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
+    print("\nTEST QUARTO GRAFO\n")
+    if (a == None):
+            print("\nGrafo non bipartito")
+            print("\n-------------------------------------------------------\n")
+    else:
+        print("Grafo bipartito\n")
+        print("Partizione X\n")
+        for i in rosso:
+            print(i)
+        print("\nPartizione Y\n")
+        for c in blu:
+            print(c)
+        print("\n-------------------------------------------------------\n")
 
 
 
