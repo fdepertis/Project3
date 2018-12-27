@@ -107,8 +107,7 @@ if __name__ == '__main__':
     gnbi2.insert_edge(c, d, None)
     gnbi2.insert_edge(d, e, None)
 
-    rosso = set()
-    blu = set()
+
 
 
 
