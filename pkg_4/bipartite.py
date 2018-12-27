@@ -108,8 +108,7 @@ if __name__ == '__main__':
     rosso = set()
     blu = set()
 
-    a, rosso, blu = bipartite(
-        gbi)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
+    a, rosso, blu = bipartite(gbi)  # per fare test ci sono quattro grafi due bipartiti gbi e gbi2 e due non bipartiti gnbi e gnbi2
 
     if (a == 1):
         print("Grafo non bipartito")
