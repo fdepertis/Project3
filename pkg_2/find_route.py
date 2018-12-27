@@ -6,7 +6,7 @@ per l’esercizio precedente, bisogna tener conto del tempo minimo di coincidenz
 ogni scalo).
 """
 
-from Project3.timetable import Timetable
+from Project3.pkg_2.timetable_2 import Timetable
 import datetime
 
 

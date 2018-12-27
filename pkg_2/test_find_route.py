@@ -1,4 +1,4 @@
-from Project3.timetable import Timetable
+from Project3.pkg_2.timetable_2 import Timetable
 from Project3.pkg_2.find_route import find_route
 import datetime
 
@@ -44,5 +44,6 @@ for i in range(8, 16):
     timetable.insert_flight(mxp, trn, datetime.datetime(2019, 1, 1, i, 0, 0), datetime.datetime(2019, 1, 1, i+2, 0, 0), 200)
     timetable.insert_flight(mxp, flr, datetime.datetime(2019, 1, 1, i, 0, 0), datetime.datetime(2019, 1, 1, i+2, 0, 0), 200)
 
+print("Best Route from Naples to Milan")
 for f in find_route(timetable, nap, mxp, datetime.datetime(2019, 1, 1, 8, 0, 0)):
     print(f)
