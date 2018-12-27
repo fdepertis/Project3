@@ -44,14 +44,5 @@ for i in range(8, 16):
     timetable.insert_flight(mxp, trn, datetime.datetime(2019, 1, 1, i, 0, 0), datetime.datetime(2019, 1, 1, i+2, 0, 0), 200)
     timetable.insert_flight(mxp, flr, datetime.datetime(2019, 1, 1, i, 0, 0), datetime.datetime(2019, 1, 1, i+2, 0, 0), 200)
 
-"""print("Airports:")
-for airport in timetable.airports():
-    print(airport)
-print("Airports number:", timetable.airport_count())
-print("Flights number:", timetable.flight_count())
-print("Voli che partono da Napoli:")
-for f in timetable.incident_flights(nap):
-    print(f)"""
-print("\nMiglior Rotta per Napoli - Milano, stando a Napoli alle 8:")
 for f in find_route(timetable, nap, mxp, datetime.datetime(2019, 1, 1, 8, 0, 0)):
     print(f)
