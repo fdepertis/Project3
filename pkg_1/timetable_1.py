@@ -11,11 +11,7 @@ compagnia è dato da:
     - l’orario di partenza l(f)
     - l’orario di arrivo a(f)
     - il numero di posti disponibili sul volo p(f)
-
-Timetable implemented as Adjacency List, where a two dictionaries map Airports to incident Flights (outgoing anc incoming).
-These 2*n Flight lists are ordered on increasing departure time of Flights.
 """
-
 import datetime
 
 
@@ -36,7 +32,7 @@ class Timetable:
             return self._coincidence_time
 
         def __hash__(self):
-            return hash((self.name(), self.c()))
+            return hash((self._name, self._coincidence_time))
 
         def __str__(self):
             return "Airport: " + str(self._name) + "\nCoincidence Time: " + str(self._coincidence_time)
@@ -62,6 +58,11 @@ class Timetable:
                 self._departure_time = departure_time
                 self._arrival_time = arrival_time
                 self._available_seats = available_seats
+                self._diesel = self.compute_diesel(departure_time,arrival_time)
+
+        def compute_diesel(self,d,a):
+            e = a-d
+            return (e.days + e.seconds/60/60)*60
 
         def opposite(self, a):
             """Return the vertex that is opposite v on this edge."""
@@ -73,6 +74,9 @@ class Timetable:
                 return self._origin
             else:
                 raise ValueError('A not incident to Flight')
+
+        def diesel(self):
+            return self._diesel
 
         def s(self):
             return self._origin
@@ -89,18 +93,23 @@ class Timetable:
         def p(self):
             return self._available_seats
 
-        def __hash__(self):
-            return hash((self.s(), self.d(), self.l(), self.a(), self. p()))
+        def flight_time(self):
+            return self._arrival_time - self._departure_time
+
+        """def __hash__(self):
+            return hash((self._origin, self._destination, self._departure_time, self._arrival_time, self._available_seats))"""
 
         def __str__(self):
             return "Flight from: " + str(self.s().name()) + ", to: " + str(self.d().name()) + "\nDeparture: " + str(self.l()) + ", Arrival: " + str(self.a()) + ", Available Seats: " + str(self.p())
 
-        def __eq__(self, other):
-            return self.s() == other.s() and self.d() == other.d() and self.l() == other.l() and self.a() == other.a()
-
     def __init__(self):
         self._outgoing = {}
         self._incoming = {}
+        self._set_outgoing = {}
+        self._set_incoming = {}
+
+    def __getitem__(self, item):
+        return self._set_outgoing[item]
 
     def _validate_airport(self, a):
         """Verify that a is an Airport of this timetable."""
@@ -146,11 +155,16 @@ class Timetable:
         adj = self._outgoing if outgoing else self._incoming
         return len(adj[a])
 
-    def incident_flights(self, a, outgoing=True):
+    def incident_flights(self, a, outgoing=True, Flag = True):
         self._validate_airport(a)
-        adj = self._outgoing if outgoing else self._incoming
-        for f in adj[a]:
-            yield f
+        if Flag == True:
+            adj = self._outgoing if outgoing else self._incoming
+            for f in adj[a]:
+                yield f
+        else:
+            adj = self._set_outgoing if outgoing else self._set_incoming
+            for f in adj[a]:
+                yield f
 
     def incident_flights_reversed(self, a, outgoing=True):
         self._validate_airport(a)
@@ -161,8 +175,11 @@ class Timetable:
     def insert_airport(self, name, coincidence_time=datetime.timedelta(0)):
         """Insert and return a new Vertex with element x."""
         a = self.Airport(name, coincidence_time)
+
         self._outgoing[a] = []
         self._incoming[a] = []
+        self._set_outgoing[a] = set()
+        self._set_incoming[a] = set()
         return a
 
     def insert_flight(self, origin, destination, departure_time, arrival_time, available_seats):
@@ -174,11 +191,11 @@ class Timetable:
         self._validate_airport(origin)
         self._validate_airport(destination)
         f = self.Flight(origin, destination, departure_time, arrival_time, available_seats)
-        for flight in self.get_direct_flights(origin, destination):
-            if f == flight:
-                raise ValueError("There is already a flight with same origin, destination, departure and arrival times.")
         self._insert_flight_in_order(self._outgoing[origin], f)
         self._insert_flight_in_order(self._incoming[destination], f)
+
+        self._set_outgoing[origin] = set(self._outgoing[origin])
+        self._set_incoming[destination] = set(self._incoming[destination])
 
     def _insert_flight_in_order(self, flight_list, f):
         i = 0
@@ -195,15 +212,15 @@ class Timetable:
 if __name__ == '__main__':
     t = Timetable()
     nap = t.insert_airport("NAP", datetime.timedelta(minutes=30))
-    mxp = t.insert_airport("MXP", datetime.timedelta(minutes=30))
-    rom = t.insert_airport("FCO")
+    mil = t.insert_airport("MIL", datetime.timedelta(minutes=30))
+    rom = t.insert_airport("ROM")
 
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 12, 0, 0), datetime.datetime(2018, 1, 1, 14, 0, 0), 200)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 8, 0, 0), datetime.datetime(2018, 1, 1, 10, 0, 0), 200)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 10, 0, 0), datetime.datetime(2018, 1, 1, 12, 0, 0), 200)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 13, 0, 0), datetime.datetime(2018, 1, 1, 15, 0, 0), 200)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 9, 0, 0), datetime.datetime(2018, 1, 1, 11, 0, 0), 200)
-    t.insert_flight(nap, mxp, datetime.datetime(2018, 1, 1, 7, 0, 0), datetime.datetime(2018, 1, 1, 9, 0, 0), 200)
+    t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 12, 0, 0), datetime.datetime(2018, 1, 1, 14, 0, 0), 200)
+    t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 8, 0, 0), datetime.datetime(2018, 1, 1, 10, 0, 0), 200)
+    t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 10, 0, 0), datetime.datetime(2018, 1, 1, 12, 0, 0), 200)
+    t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 13, 0, 0), datetime.datetime(2018, 1, 1, 15, 0, 0), 200)
+    t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 9, 0, 0), datetime.datetime(2018, 1, 1, 11, 0, 0), 200)
+    t.insert_flight(nap, mil, datetime.datetime(2018, 1, 1, 7, 0, 0), datetime.datetime(2018, 1, 1, 9, 0, 0), 200)
 
     print("Incident Flights: ")
     for f in t.incident_flights(nap):
@@ -222,8 +239,8 @@ if __name__ == '__main__':
     print("\nDegrees: ")
     print(t.degree(nap))
     print(t.degree(nap, False))
-    print(t.degree(mxp))
-    print(t.degree(mxp, False))
+    print(t.degree(mil))
+    print(t.degree(mil, False))
     print("\nDirect Flights: ")
-    for f in t.get_direct_flights(nap, mxp):
+    for f in t.get_direct_flights(nap, mil):
         print(f)
