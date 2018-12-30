@@ -29,11 +29,14 @@ timetable.insert_flight(c,f,datetime.datetime(2018,12,22,9,0,0),datetime.datetim
 B=60
 print("Trovare tutti i voli della compangia per cui si possa massimizzare\nil numero di di passeggeri in transito rientrando in un budget di",B)
 
-flights,money= select_flights(timetable,B)
-print("\nVoli selezionati")
-for i in flights:
-    print(i)
-print("\nBudget assegnati ai vari aereoporti")
-for i in money.keys():
-    print(i)
-    print("Buget: " + str(money[i]) + " $")
+result = select_flights(timetable,B)
+if result==None:
+    print("\nNessun volo selezionato, Budget negativo!")
+else:
+    print("\nVoli selezionati")
+    for i in result[0]:
+        print(i)
+    print("\nBudget assegnati ai vari aereoporti")
+    for i in result[1].keys():
+        print(i)
+        print("Buget: " + str(result[1][i]) + " $")

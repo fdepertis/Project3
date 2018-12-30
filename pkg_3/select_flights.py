@@ -77,7 +77,7 @@ def select_flights(timetable,B):#O(m*B)
     if a == 0:
         return None
     else:
-        return tmp[1].keys(),tmp[2]
+        return (tmp[1].keys(),tmp[2])
 
 
 
