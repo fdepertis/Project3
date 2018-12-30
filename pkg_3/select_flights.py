@@ -73,9 +73,11 @@ def select_flights(timetable,B):#O(m*B)
     n = len(timetable.get_flights())
     DP = [[-1]*(B+1) for i in range(n+1)]
 
-    knapsackRec(timetable,n,B,DP)
-
-    return tmp[1].keys(),tmp[2]
+    a=knapsackRec(timetable,n,B,DP)
+    if a == 0:
+        return None
+    else:
+        return tmp[1].keys(),tmp[2]
 
 
 
