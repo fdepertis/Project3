@@ -39,7 +39,7 @@ class Timetable:
             return hash((self.name(), self.c()))
 
         def __str__(self):
-            return "Airport: " + str(self._name) + "\nCoincidence Time: " + str(self._coincidence_time)
+            return "Airport: " + str(self._name)
 
         def __eq__(self, other):
             return self._name == other._name and self._coincidence_time == other._coincidence_time
@@ -62,6 +62,7 @@ class Timetable:
                 self._departure_time = departure_time
                 self._arrival_time = arrival_time
                 self._available_seats = available_seats
+                self._diesel = self.compute_diesel(departure_time,arrival_time)
 
         def opposite(self, a):
             """Return the vertex that is opposite v on this edge."""
@@ -73,6 +74,16 @@ class Timetable:
                 return self._origin
             else:
                 raise ValueError('A not incident to Flight')
+
+        def compute_diesel(self,d,a):
+            e = a-d
+            return (e.days + e.seconds/60/60)*60
+
+        def price(self):
+            return self._diesel
+
+        def factor_quality(self):
+            return self.diesel()/self.p()
 
         def s(self):
             return self._origin
@@ -105,6 +116,13 @@ class Timetable:
     def __init__(self):
         self._airports = []
         self._flights = []
+
+    def get_flights(self):
+        return self._flights
+
+    def is_empty_flights(self):
+        if len(self._flights) == 0: return True
+        else: return False
 
     def _validate_airport(self, a):
         """Verify that a is an Airport of this timetable."""
@@ -191,7 +209,7 @@ class Timetable:
         i = 0
         added = False
         while i < len(self._flights) and not added:
-            if self._flights[i].p() < f.p():
+            if self._flights[i].p()/self._flights[i].price() < f.p()/f.price():
                 self._flights.insert(i, f)
                 added = True
             i += 1
